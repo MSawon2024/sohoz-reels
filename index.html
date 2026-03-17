@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SoHoZ Global Reels</title>
+    <title>SoHoZ Reels</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
         body { background:#000; overflow:hidden; font-family: sans-serif; }
         .feed { height:100vh; overflow-y:scroll; scroll-snap-type:y mandatory; scrollbar-width:none; }
         .feed::-webkit-scrollbar { display:none; }
-        .reel { height:100vh; width:100vw; scroll-snap-align:start; position:relative; background:#000; display:flex; align-items:center; }
+        .reel { height:100vh; width:100vw; scroll-snap-align:start; position:relative; display:flex; align-items:center; justify-content:center; background:#000; }
         video { width:100%; height:100%; object-fit:cover; }
-        .ui { position:absolute; bottom:50px; left:20px; color:#fff; z-index:10; text-shadow:0 0 10px #000; }
-        .ui h4 { color: #00ffff; margin-bottom: 5px; font-size: 18px; }
+        .ui { position:absolute; bottom:60px; left:20px; color:#fff; z-index:10; }
+        .ui h4 { color: #00ffff; margin-bottom: 5px; font-size: 18px; text-shadow: 0 0 10px #000; }
+        .ui p { font-size: 14px; text-shadow: 0 0 10px #000; }
     </style>
 </head>
 <body>
@@ -21,37 +22,39 @@
 <script>
     const feed = document.getElementById('feed');
     
-    // সরাসরি কিছু স্যাম্পল ভিডিও লিঙ্ক (টেস্ট করার জন্য)
-    const videoSources = [
-        "https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-light-12859-large.mp4",
-        "https://assets.mixkit.co/videos/preview/mixkit-tree-with-yellow-flowers-1173-large.mp4",
-        "https://assets.mixkit.co/videos/preview/mixkit-slow-motion-video-of-a-woman-in-the-city-at-night-34505-large.mp4"
+    // এই লিঙ্কগুলো সরাসরি কাজ করবে (Sample Videos)
+    const videos = [
+        "https://v.ftn.icu/nature_1.mp4",
+        "https://v.ftn.icu/city_1.mp4",
+        "https://v.ftn.icu/abstract_1.mp4"
     ];
 
-    function loadReels() {
-        videoSources.forEach(src => {
-            const card = document.createElement('div');
-            card.className = 'reel';
-            card.innerHTML = `
-                <video src="${src}" loop playsinline muted></video>
-                <div class="ui"><h4>@SoHoZ_User</h4><p>Global Content Loading...</p></div>`;
-            feed.appendChild(card);
-            observer.observe(card);
-        });
+    function createReel(src) {
+        const card = document.createElement('div');
+        card.className = 'reel';
+        card.innerHTML = `
+            <video src="${src}" loop playsinline muted autoplay></video>
+            <div class="ui">
+                <h4>@SoHoZ_User</h4>
+                <p>Welcome to SoHoZ Global Feed ✨</p>
+            </div>`;
+        feed.appendChild(card);
+        observer.observe(card);
     }
 
     const observer = new IntersectionObserver(entries => {
         entries.forEach(e => {
             const v = e.target.querySelector('video');
             if(e.isIntersecting) {
-                v.play().catch(err => console.log("Auto-play blocked"));
+                v.play().catch(() => {});
             } else {
                 v.pause();
             }
         });
     }, {threshold: 0.6});
 
-    loadReels();
+    // ভিডিওগুলো লোড করা
+    videos.forEach(src => createReel(src));
 </script>
 </body>
 </html>
