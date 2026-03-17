@@ -3,95 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SoHoZ Global Feed</title>
+    <title>SoHoZ Reels</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { background:#000; overflow:hidden; color: #fff; font-family: sans-serif; }
-        .feed { height:100vh; overflow-y:scroll; scroll-snap-type:y mandatory; scrollbar-width:none; }
-        .feed::-webkit-scrollbar { display:none; }
-        .reel { height:100vh; width:100vw; scroll-snap-align:start; position:relative; display:flex; align-items:center; justify-content:center; }
-        video { width:100%; height:100%; object-fit:cover; background: #111; }
-        .ui { position:absolute; bottom:60px; left:20px; z-index:10; }
-        .ui h3 { color: #00ffff; margin-bottom: 5px; text-shadow: 0 0 10px rgba(0,255,255,0.5); }
-        /* স্টার্ট বাটন (প্রথমবার ব্যবহারের জন্য) */
-        #start-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); z-index: 100; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        body, html { height: 100%; background: #000; overflow: hidden; }
+        
+        /* মেইন কন্টেইনার যা ভিডিওগুলোকে আলাদা রাখবে */
+        .reels-container {
+            height: 100vh;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory; /* এক টানে একটি ভিডিও */
+            scrollbar-width: none;
+        }
+        .reels-container::-webkit-scrollbar { display: none; }
+
+        .reel-unit {
+            height: 100vh;
+            width: 100vw;
+            scroll-snap-align: start;
+            position: relative;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* ভিডিও পুরো স্ক্রিন জুড়ে থাকবে */
+        }
+
+        /* টেক্সট ডিজাইন */
+        .video-info {
+            position: absolute;
+            bottom: 60px;
+            left: 20px;
+            color: white;
+            z-index: 10;
+            font-family: sans-serif;
+            pointer-events: none;
+        }
+        .video-info h3 { color: #00ffff; margin-bottom: 5px; text-shadow: 2px 2px 5px #000; }
+        .video-info p { font-size: 14px; text-shadow: 1px 1px 3px #000; }
     </style>
 </head>
 <body>
 
-<div id="start-overlay" onclick="startApp()">
-    <div style="text-align: center;">
-        <p style="font-size: 50px;">▶️</p>
-        <p>Click to Watch Global Feed</p>
+<div class="reels-container" id="reels">
     </div>
-</div>
-
-<div class="feed" id="feed"></div>
 
 <script>
-    const feed = document.getElementById('feed');
+    const container = document.getElementById('reels');
     
-    // হাই-স্পিড CDN ভিডিও সোর্স (এগুলো তাড়াতাড়ি লোড হবে)
+    // ভিডিওর সোর্স লিস্ট
     const videos = [
-        "https://v.redd.it/f8x0x0g9p6ma1/DASH_720.mp4",
-        "https://www.w3schools.com/html/mov_bbb.mp4",
-        "https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-light-12859-large.mp4"
+        "https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-light-12859-large.mp4",
+        "https://assets.mixkit.co/videos/preview/mixkit-tree-with-yellow-flowers-1173-large.mp4",
+        "https://assets.mixkit.co/videos/preview/mixkit-slow-motion-video-of-a-woman-in-the-city-at-night-34505-large.mp4",
+        "https://assets.mixkit.co/videos/preview/mixkit-vertical-shot-of-a-keyboard-and-mouse-with-neon-lights-42589-large.mp4"
     ];
 
-    function startApp() {
-        document.getElementById('start-overlay').style.display = 'none';
-        loadReels();
-    }
-
-    function loadReels() {
-        videos.forEach(src => {
-            const card = document.createElement('div');
-            card.className = 'reel';
-            card.innerHTML = `
-                <video src="${src}" loop playsinline></video>
-                <div class="ui">
+    function createReels() {
+        videos.forEach((src, index) => {
+            const section = document.createElement('div');
+            section.className = 'reel-unit';
+            section.innerHTML = `
+                <video src="${src}" loop playsinline muted></video>
+                <div class="video-info">
                     <h3>@SoHoZ_User</h3>
-                    <p>Welcome to SoHoZ Global Feed ✨</p>
-                </div>`;
-            feed.appendChild(card);
-            observer.observe(card);
+                    <p>Global Trending Video #${index + 1}</p>
+                </div>
+            `;
+            container.appendChild(section);
+            observer.observe(section);
         });
     }
 
-    const observer = new IntersectionObserver(entries => {
-        entries.forEach(e => {
-            const v = e.target.querySelector('video');
-            if(e.isIntersecting) {
-                v.play().catch(err => console.log("Play failed"));
+    // অটো-প্লে লজিক
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            const vid = entry.target.querySelector('video');
+            if (entry.isIntersecting) {
+                vid.play();
             } else {
-                v.pause();
+                vid.pause();
+                vid.currentTime = 0; // পরের বার শুরুতে ফিরে যাবে
             }
         });
-    }, {threshold: 0.8});
+    }, { threshold: 0.8 });
 
-</script>
-</body>
-</html>            <div class="ui">
-                <h4>@SoHoZ_User</h4>
-                <p>Welcome to SoHoZ Global Feed ✨</p>
-            </div>`;
-        feed.appendChild(card);
-        observer.observe(card);
-    }
-
-    const observer = new IntersectionObserver(entries => {
-        entries.forEach(e => {
-            const v = e.target.querySelector('video');
-            if(e.isIntersecting) {
-                v.play().catch(() => {});
-            } else {
-                v.pause();
-            }
-        });
-    }, {threshold: 0.6});
-
-    // ভিডিওগুলো লোড করা
-    videos.forEach(src => createReel(src));
+    createReels();
 </script>
 </body>
 </html>
