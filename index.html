@@ -13,50 +13,45 @@
         video { width:100%; height:100%; object-fit:cover; }
         .ui { position:absolute; bottom:50px; left:20px; color:#fff; z-index:10; text-shadow:0 0 10px #000; }
         .ui h4 { color: #00ffff; margin-bottom: 5px; font-size: 18px; }
-        .side-bar { position:absolute; right:15px; bottom:120px; display:flex; flex-direction:column; gap:20px; }
-        .icon { width:45px; height:45px; background:rgba(255,255,255,0.1); backdrop-filter:blur(10px); border-radius:50%; border:1px solid rgba(0,255,255,0.3); display:flex; align-items:center; justify-content:center; color:#fff; font-size: 20px; }
     </style>
 </head>
 <body>
 <div class="feed" id="feed"></div>
+
 <script>
     const feed = document.getElementById('feed');
-    // Pixabay API - এটি অটোমেটিক ভিডিও নিয়ে আসবে
-    async function loadVideos() {
-        try {
-            const res = await fetch('https://pixabay.com/api/videos/?key=43004464-968e7b9e7352345638c035678&q=nature&per_page=10');
-            const data = await res.json();
-            data.hits.forEach(v => {
-                const card = document.createElement('div');
-                card.className = 'reel';
-                card.innerHTML = `
-                    <video src="${v.videos.medium.url}" loop playsinline></video>
-                    <div class="side-bar">
-                        <div class="icon">❤️</div>
-                        <div class="icon">⭐</div>
-                        <div class="icon">↗️</div>
-                    </div>
-                    <div class="ui"><h4>@SoHoZ_User</h4><p>Trending Reel from Global Sources</p></div>`;
-                feed.appendChild(card);
-                observer.observe(card);
-            });
-        } catch(e) { console.log("Error loading videos"); }
+    
+    // সরাসরি কিছু স্যাম্পল ভিডিও লিঙ্ক (টেস্ট করার জন্য)
+    const videoSources = [
+        "https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-light-12859-large.mp4",
+        "https://assets.mixkit.co/videos/preview/mixkit-tree-with-yellow-flowers-1173-large.mp4",
+        "https://assets.mixkit.co/videos/preview/mixkit-slow-motion-video-of-a-woman-in-the-city-at-night-34505-large.mp4"
+    ];
+
+    function loadReels() {
+        videoSources.forEach(src => {
+            const card = document.createElement('div');
+            card.className = 'reel';
+            card.innerHTML = `
+                <video src="${src}" loop playsinline muted></video>
+                <div class="ui"><h4>@SoHoZ_User</h4><p>Global Content Loading...</p></div>`;
+            feed.appendChild(card);
+            observer.observe(card);
+        });
     }
 
     const observer = new IntersectionObserver(entries => {
         entries.forEach(e => {
             const v = e.target.querySelector('video');
             if(e.isIntersecting) {
-                v.play().catch(()=>{});
-                // যদি শেষ ভিডিওতে আসে তবে নতুন ভিডিও লোড করবে
-                if (e.target === feed.lastElementChild) loadVideos();
+                v.play().catch(err => console.log("Auto-play blocked"));
             } else {
                 v.pause();
             }
         });
-    }, {threshold:0.7});
+    }, {threshold: 0.6});
 
-    loadVideos();
+    loadReels();
 </script>
 </body>
 </html>
